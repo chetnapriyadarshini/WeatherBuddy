@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+        <EditTextPreference android:id="@+id/pref_location"
+            android:title="@string/pref_settings_location"
+            android:key="@string/pref_location_key"
+            android:defaultValue="@string/pref_default_location"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <ListPreference
+            android:title="@string/pref_settings_select_measurement_unit"
+            android:key="@string/pref_unit_key"
+            android:defaultValue="@string/pref_default_measurement_unit"
+            android:entries="@array/entries_measurement_preference"
+            android:entryValues="@array/values_measurement_preference"
+            android:dialogTitle="@string/pref_settings_select_measurement_unit"
+            android:summary="@string/pref_summary_measurement_unit"
+            />
+
+        <CheckBoxPreference
+            android:title="@string/pref_notifications"
+            android:key="@string/pref_notification_key"
+            android:summaryOff="@string/pref_disable"
+            android:summaryOn="@string/pref_enable"
+            android:checked="true"
+            android:defaultValue="true"/>
+
+
+</PreferenceScreen>
