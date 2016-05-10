@@ -1,15 +1,7 @@
 package com.application.chetna_priya.weather_forecast.app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +9,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,10 +21,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.application.chetna_priya.weather_forecast.app.data.WeatherContract;
+import com.bumptech.glide.Glide;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -38,6 +35,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     final String EXTRA_TEXT = "weather_info";
     final String TAG = DetailFragment.class.getSimpleName();
+    public static final String DETAIL_TRANSITION_ANIMATION = "postpone_detail_transition_animation";
 
     private static final String[] DETAIL_COLUMNS = {
             WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
@@ -54,8 +52,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int COL_WEATHER_ID = 0;
     public static final int COL_WEATHER_DATE = 1;
     public static final int COL_WEATHER_DESC = 2;
-    public static final int COL_WEATHER_MAX_TEMP = 3;
-    public static final int COL_WEATHER_MIN_TEMP = 4;
+    public static final int COL_WEATHER_MIN_TEMP = 3;
+    public static final int COL_WEATHER_MAX_TEMP = 4;
     public static final int COL_WEATHER_HUMIDITY = 5;
     public static final int COL_WEATHER_PRESSURE = 6;
     public static final int COL_WEATHER_WIND_SPEED = 7;
@@ -68,7 +66,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String hashTagSunshineApp = " #SunshineApp";
     private static final int DETAIL_WEATHER_LOADER = 0;
     private TextView mDateView;
-    private TextView mDayView;
+   // private TextView mDayView;
     private TextView mHighTempView;
     private TextView mLowTempView;
     private TextView mWeatherDesc;
@@ -77,8 +75,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mPressureView;
     private ImageView mWeatherIcon;
     private Uri mWeatherUri;
-
-    MyCustomVew myView;
 
 
     private static final String DATA_URI = "data_uri";
@@ -93,12 +89,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         setHasOptionsMenu(true);
     }
 
-    public static DetailFragment newInstance(Uri uri) {
+    public static DetailFragment newInstance(Uri uri, boolean postponeAnim) {
         DetailFragment f = new DetailFragment();
 
         // Supply index input as an argument.
         Bundle args = new Bundle();
-        args.putParcelable(DATA_URI,uri);
+        args.putParcelable(DATA_URI, uri);
+        args.putBoolean(DETAIL_TRANSITION_ANIMATION, postponeAnim);
         f.setArguments(args);
 
         return f;
@@ -119,20 +116,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_detail_start, container, false);
         mWeatherUri = getSelectedUri();
-        mDateView = (TextView) rootView.findViewById(R.id.tv_date);
-        mDayView = (TextView)rootView.findViewById(R.id.tv_day);
-        mHighTempView = (TextView) rootView.findViewById(R.id.tv_max_temp);
-        mLowTempView = (TextView) rootView.findViewById(R.id.tv_min_temp);
-        mWeatherDesc = (TextView) rootView.findViewById(R.id.tv_weather_desc);
+        mDateView = (TextView) rootView.findViewById(R.id.detail_date_textview);
+       // mDayView = (TextView)rootView.findViewById(R.id.detail_date_textview);
+        mHighTempView = (TextView) rootView.findViewById(R.id.detail_high_textview);
+        mLowTempView = (TextView) rootView.findViewById(R.id.detail_low_textview);
+        mWeatherDesc = (TextView) rootView.findViewById(R.id.detail_forecast_textview);
         mHumidityView = (TextView) rootView.findViewById(R.id.tv_humidity);
         mWindSpeedView = (TextView) rootView.findViewById(R.id.tv_wind);
         mPressureView = (TextView) rootView.findViewById(R.id.tv_pressure);
-        mWeatherIcon = (ImageView) rootView.findViewById(R.id.img_weather_icon);
+        mWeatherIcon = (ImageView) rootView.findViewById(R.id.detail_icon);
         Log.d(TAG, "IN on create view of detail acitivity fragment");
-
-        myView = new MyCustomVew(getActivity());
         return rootView;
     }
 
@@ -176,130 +171,101 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 null,
                 null,
                 null);
-        else
+        ViewParent vp = getView().getParent();
+        if ( vp instanceof CardView ) {
+            ((View)vp).setVisibility(View.INVISIBLE);
+        }
             return null;
     }
 
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        cursor.moveToFirst();
-        Log.d(TAG, "ROWS: "+cursor.getCount()+" COLUMNS: "+cursor.getColumnCount());
-        Long date = cursor.getLong(COL_WEATHER_DATE);
-        Double max_temp = cursor.getDouble(COL_WEATHER_MAX_TEMP);
-        Double min_temp = cursor.getDouble(COL_WEATHER_MIN_TEMP);
-        String description = cursor.getString(COL_WEATHER_DESC);
-        Float humidity = cursor.getFloat(COL_WEATHER_HUMIDITY);
-        Float pressure = cursor.getFloat(COL_WEATHER_PRESSURE);
+        if (cursor != null && cursor.moveToFirst()) {
+            if(getArguments().getBoolean(DETAIL_TRANSITION_ANIMATION, false))
+                getActivity().supportStartPostponedEnterTransition();
+            ViewParent vp = getView().getParent();
+            if (vp instanceof CardView) {
+                ((View) vp).setVisibility(View.VISIBLE);
+            }
+            cursor.moveToFirst();
+            Log.d(TAG, "ROWS: " + cursor.getCount() + " COLUMNS: " + cursor.getColumnCount());
+            Long date = cursor.getLong(COL_WEATHER_DATE);
+            Double max_temp = cursor.getDouble(COL_WEATHER_MAX_TEMP);
+            Double min_temp = cursor.getDouble(COL_WEATHER_MIN_TEMP);
+            String description = cursor.getString(COL_WEATHER_DESC);
+            Float humidity = cursor.getFloat(COL_WEATHER_HUMIDITY);
+            Float pressure = cursor.getFloat(COL_WEATHER_PRESSURE);
 
-        String dayName = Utility.getDayName(getActivity(), date);
-        String dateText = Utility.getFormattedMonthDay(getActivity(),date);
-       // String dateStr = dayName.toUpperCase()+"\n"+dateText.toUpperCase();
-        mDateView.setText(dateText);
-        mDayView.setText(dayName);
+            String dayName = Utility.getDayName(getActivity(), date);
+            String dateText = Utility.getFormattedMonthDay(getActivity(), date);
+            // String dateStr = dayName.toUpperCase()+"\n"+dateText.toUpperCase();
+            mDateView.setText(dayName + ", " + dateText);
+            //mDayView.setText(dayName);
 
-        String high = Utility.formatTemperature(getActivity(), max_temp);
-        String low = Utility.formatTemperature(getActivity(), min_temp);
-        mHighTempView.setText(high);
-        mLowTempView.setText(low);
+            String high = Utility.formatTemperature(getActivity(), max_temp);
+            String low = Utility.formatTemperature(getActivity(), min_temp);
+            mHighTempView.setText(high);
+            mLowTempView.setText(low);
 
-        mWeatherDesc.setText(description);
+            mWeatherDesc.setText(description);
 
-        mHumidityView.setText(getActivity().getString(R.string.format_humidity, humidity));
-        float windSpeedStr = cursor.getFloat(COL_WEATHER_WIND_SPEED);
-        float windDirStr = cursor.getFloat(COL_WEATHER_DEGREES);
-        mWindSpeedView.setText(Utility.getFormattedWind(getActivity(), windSpeedStr, windDirStr));
-        mPressureView.setText(getActivity().getString(R.string.format_pressure, pressure));
+            mHumidityView.setText(getActivity().getString(R.string.format_humidity, humidity));
+            float windSpeedStr = cursor.getFloat(COL_WEATHER_WIND_SPEED);
+            float windDirStr = cursor.getFloat(COL_WEATHER_DEGREES);
+            mWindSpeedView.setText(Utility.getFormattedWind(getActivity(), windSpeedStr, windDirStr));
+            mPressureView.setText(getActivity().getString(R.string.format_pressure, pressure));
 
-        mWeatherIcon.setImageResource(Utility.getArtResourceForWeatherCondition(cursor.getInt(COL_WEATHER_CONDITION_ID)));
+            //    mWeatherIcon.setImageResource(Utility.getArtResourceForWeatherCondition(cursor.getInt(COL_WEATHER_CONDITION_ID)));
+            Glide.with(this).load(Utility.getArtUrlForWeatherCondition(getActivity(), (cursor.getInt(COL_WEATHER_CONDITION_ID))))
+                    .error(Utility.getArtResourceForWeatherCondition(cursor.getInt(COL_WEATHER_CONDITION_ID)))
+                    .into(mWeatherIcon);
+            Log.d(TAG, "DETAIL URL: " + Utility.getArtUrlForWeatherCondition(getActivity(), (cursor.getInt(COL_WEATHER_CONDITION_ID))));
 
-        mWeatherIcon.setContentDescription(description);
-        mForecastStr = String.format("%s - %s - %s/%s", dateText, description, high, low);
+            mWeatherIcon.setContentDescription(description);
+            mForecastStr = String.format("%s - %s - %s/%s", dateText, description, high, low);
 
 
-
+        }
         if(mShareActionProvider != null)
         {
             mShareActionProvider.setShareIntent(getShareIntent());
         }
+
+        AppCompatActivity activity = (AppCompatActivity)getActivity();
+        Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
+
+        // We need to start the enter transition after the data has loaded
+        if (activity instanceof DetailActivity) {
+            activity.supportStartPostponedEnterTransition();
+
+            if ( null != toolbarView ) {
+                activity.setSupportActionBar(toolbarView);
+
+                activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+                activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        } else {
+            if ( null != toolbarView ) {
+                Menu menu = toolbarView.getMenu();
+                if ( null != menu ) menu.clear();
+                toolbarView.inflateMenu(R.menu.detailfragment);
+                finishCreatingMenu(toolbarView.getMenu());
+            }
+        }
     }
+
+    private void finishCreatingMenu(Menu menu) {
+        // Retrieve the share menu item
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        menuItem.setIntent(getShareIntent());
+    }
+
+
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-    }
-
-    public static class MyCustomVew extends View
-    {
-        Paint mCirclePaint;
-        private float centerX, centerY;
-        private String TAG = MyCustomVew.class.getSimpleName();
-        private float extRadius;
-        String[] texts = {"N","E","S","W"};
-        float[]offset = new float[4];
-        private float internalRad,textOffset;
-        private Paint mTextPaint;
-        private float mTextHeight = 20, mTextWidth = 20;
-
-        public MyCustomVew(Context context) {
-            super(context);
-            initializeDrawable();
-        }
-
-        private void initializeDrawable() {
-            setWillNotDraw(false);
-            mCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mCirclePaint.setColor(getResources().getColor(R.color.black));
-            mCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
-            mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            mTextPaint.setColor(getResources().getColor(R.color.black));
-            if (mTextHeight == 0) {
-                mTextHeight = mTextPaint.getTextSize();
-            } else {
-                mTextPaint.setTextSize(mTextHeight);
-            }
-
-        }
-
-        public MyCustomVew(Context context, AttributeSet attrs, int defStyleAttr) {
-            super(context, attrs, defStyleAttr);
-            initializeDrawable();
-        }
-
-        public MyCustomVew(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            initializeDrawable();
-        }
-
-
-        @Override
-        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-            super.onSizeChanged(w, h, oldw, oldh);
-
-            float xpad = (float) getPaddingLeft() + getPaddingRight();
-            float ypad = (float) getPaddingTop() + getPaddingBottom();
-            w = getWidth();
-            h = getHeight();
-            float ww = (float)w - xpad; float hh = (float)h - ypad;
-            extRadius = Math.min(ww, hh) / 2;
-            internalRad = extRadius -3;
-            float[] offsetArr = {0,internalRad,0,-internalRad};
-            offset = offsetArr;
-            centerX = w/2;
-            centerY = h/2;
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-            Log.d(TAG, "ON DRAWWWWWWWWWWWWWWWWW");
-            canvas.drawCircle(centerX, centerY, extRadius, mCirclePaint);
-            mCirclePaint.setStyle(Paint.Style.STROKE);
-            canvas.drawCircle(centerX, centerY, internalRad, mCirclePaint);
-            Path path = new Path();
-            path.addCircle(centerX,centerY,internalRad, Path.Direction.CW);
-            for(int i=0; i<texts.length;i++)
-                canvas.drawTextOnPath(texts[i],path,offset[i],0,mTextPaint);
-        }
     }
 }

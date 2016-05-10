@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_additional_pane"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="2"
+    app:columnCount="2"
+    android:background="@color/detail_accent_pane_background"
+    android:paddingLeft="@dimen/additonal_pane_horizontal_padding"
+    android:paddingRight="@dimen/additonal_pane_horizontal_padding"
+    android:paddingEnd="@dimen/additonal_pane_horizontal_padding"
+    android:paddingTop="@dimen/abc_list_item_padding_horizontal_material"
+    android:paddingBottom="@dimen/abc_list_item_padding_horizontal_material">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:paddingEnd="@dimen/forecast_detail_horizontal_padding"
+        android:paddingRight="@dimen/forecast_detail_horizontal_padding"
+        android:textColor="@color/detail_accent_label"
+        android:gravity="center_vertical"
+        app:layout_columnSpan="1"
+        app:layout_columnWeight="1"
+        app:layout_gravity="fill"
+        app:layout_rowWeight="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:text="@string/humidity"/>
+
+    <TextView
+        android:id="@+id/tv_humidity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/forecast_detail_horizontal_padding"
+        android:paddingRight="@dimen/forecast_detail_horizontal_padding"
+        android:fontFamily="sans-serif-condensed"
+        android:textColor="@color/white"
+        android:gravity="center_vertical"
+        app:layout_columnSpan="1"
+        app:layout_gravity="fill"
+        tools:text="@string/humidity"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:paddingEnd="@dimen/forecast_detail_horizontal_padding"
+        android:paddingRight="@dimen/forecast_detail_horizontal_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:gravity="center_vertical"
+        android:text="@string/pressure"
+        app:layout_columnSpan="1"
+        app:layout_rowWeight="1"
+        app:layout_gravity="fill"
+        android:textColor="@color/detail_accent_label"/>
+
+
+    <TextView
+        android:id="@+id/tv_pressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:paddingEnd="@dimen/forecast_detail_horizontal_padding"
+        android:paddingRight="@dimen/forecast_detail_horizontal_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:gravity="center_vertical"
+        android:textColor="@color/white"
+        app:layout_gravity="fill"
+        app:layout_columnSpan="1"
+        tools:text="5 hPa"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:paddingEnd="@dimen/forecast_detail_horizontal_padding"
+        android:paddingRight="@dimen/forecast_detail_horizontal_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:gravity="center_vertical"
+        android:text="@string/wind"
+        app:layout_columnSpan="1"
+        app:layout_rowWeight="1"
+        app:layout_gravity="fill"
+        android:textColor="@color/detail_accent_label"/>
+
+    <TextView
+        android:id="@+id/tv_wind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:gravity="center_vertical"
+        tools:text="763 Km/h SW"
+        app:layout_columnSpan="1"
+        app:layout_gravity="fill"
+        android:textColor="@color/white"/>
+
+
+</android.support.v7.widget.GridLayout>

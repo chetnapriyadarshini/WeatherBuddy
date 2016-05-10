@@ -88,7 +88,7 @@ public class TestProvider extends AndroidTestCase {
        delete functionality is available in the ContentProvider.
      */
     public void deleteAllRecordsFromDB() {
-        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
+        WeatherDbHelper dbHelper = WeatherDbHelper.getInstance(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         db.delete(WeatherEntry.TABLE_NAME, null, null);
@@ -183,7 +183,7 @@ public class TestProvider extends AndroidTestCase {
      */
     public void testBasicWeatherQuery() {
         // insert our test records into the database
-        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
+        WeatherDbHelper dbHelper = WeatherDbHelper.getInstance(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
@@ -217,7 +217,7 @@ public class TestProvider extends AndroidTestCase {
      */
     public void testBasicLocationQueries() {
         // insert our test records into the database
-        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
+        WeatherDbHelper dbHelper = WeatherDbHelper.getInstance(mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues testValues = TestUtilities.createNorthPoleLocationValues();

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.application.chetna_priya.weather_forecast.app">
 
 
-        <EditTextPreference android:id="@+id/pref_location"
+        <com.application.chetna_priya.weather_forecast.app.CustomEditTextPreference
+            android:id="@+id/pref_location"
             android:title="@string/pref_settings_location"
             android:key="@string/pref_location_key"
             android:defaultValue="@string/pref_default_location"
+            custom:min_edit_location_length = "3"
             android:inputType="text"
             android:singleLine="true"/>
 
@@ -17,6 +20,16 @@
             android:entryValues="@array/values_measurement_preference"
             android:dialogTitle="@string/pref_settings_select_measurement_unit"
             android:summary="@string/pref_summary_measurement_unit"
+            />
+
+        <ListPreference
+            android:title="@string/pref_settings_select_icon_pack"
+            android:key="@string/pref_icon_key"
+            android:defaultValue="@string/pref_defualt_icon_type"
+            android:entries="@array/icon_pack_options"
+            android:entryValues="@array/icon_pack_options"
+            android:dialogTitle="@string/pref_settings_select_icon_pack"
+            android:summary="@string/pref_summary_icon_type"
             />
 
         <CheckBoxPreference

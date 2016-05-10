@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="EditPreferenceTextView">
+        <attr name="min_edit_location_length" format="integer"></attr>
+    </declare-styleable>
+    <declare-styleable name="ForecastFragment">
+        <attr name="sharedElementTransitions" format="boolean"/>
+    </declare-styleable>
+</resources>

@@ -14,8 +14,12 @@
     <string name="pref_settings_location">Location</string>
     <string name="pref_location_key" translatable = "false">location</string>
     <string name="pref_default_location" translatable = "false">80920</string>
+    <string name="pref_location_status_key" translatable = "false">location_status</string>
 
     <string name="pref_settings_select_measurement_unit">PICK YOUR UNITS</string>
+    <string name="pref_settings_select_icon_pack">Set your preferred icon style</string>
+    <string name="pref_icon_key" translatable = "false">icon_type</string>
+    <string name="pref_defualt_icon_type">Colored</string>
     <string name="pref_unit_key" translatable = "false">unit</string>
     <string name="pref_summary_measurement_unit">Metric</string>
     <string name="pref_default_measurement_unit">metric</string>
@@ -34,6 +38,15 @@
         <item>imperial</item>
         <item>metric</item>
     </string-array>
+
+    <string name="pref_summary_icon_type">Colored</string>
+
+    <string-array name="icon_pack_options">
+        <item>Colored</item>
+        <item>Mono</item>
+    </string-array>
+
+
     <!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
     <string name="today">Today</string>
 
@@ -46,15 +59,20 @@
     <string name="format_temprature"><xliff:g id = "temp">%1.0f</xliff:g>\u00B0</string>
     <!-- Windspeed formats -->
     <!-- Wind in mph [CHAR LIMIT=25] -->
-    <string name="format_wind_mph">Wind: <xliff:g id="speed">%1$1.0f</xliff:g> mph <xliff:g id="direction">%2$s</xliff:g></string>
+    <string name="format_wind_mph"><xliff:g id="speed">%1$1.0f</xliff:g> mph <xliff:g id="direction">%2$s</xliff:g></string>
     <!-- Wind in kph [CHAR LIMIT=25] -->
-    <string name="format_wind_kmh">Wind: <xliff:g id="speed">%1$1.0f</xliff:g> km/h <xliff:g id="direction">%2$s</xliff:g></string>
+    <string name="format_wind_kmh"><xliff:g id="speed">%1$1.0f</xliff:g> km/h <xliff:g id="direction">%2$s</xliff:g></string>
 
     <!-- Pressure format CHAR LIMIT=25] -->
-    <string name="format_pressure">Pressure: <xliff:g id="pressure">%1.0f</xliff:g> hPa</string>
+    <string name="format_pressure"><xliff:g id="pressure">%1.0f</xliff:g> hPa</string>
 
     <!-- Humidity format CHAR LIMIT=25]-->
-    <string name="format_humidity">Humidity: <xliff:g id="humidity">%1.0f</xliff:g> %%</string>
+    <string name="format_humidity"><xliff:g id="humidity">%1.0f</xliff:g> %%</string>
+
+
+    <!-- Format for retrieving art from an external source [CHAR LIMIT=NONE] -->
+    <string name="format_art_url" translatable="false">https://raw.githubusercontent.com/udacity/sunshine_icons/master/Archive
+        <!--<xliff:g id="type">%1$s</xliff:g>.png--></string>
 
 
     <!-- SyncAdapter related -->
@@ -68,5 +86,24 @@
     <!-- Strings related to Notification preference -->
     <string name="pref_last_notification">last_notification
     </string>
+    <string name="no_weather_info_available">No Weather Information Available</string>
+    <string name="no_internet">Please connect to the internet to fetch the weather data</string>
+    <string name="empty_forecast_list_server_down">No weather information available. The server is not returning data.</string>
+    <string name="empty_forecast_list_server_error">No weather information available. The server is not returning valid data. Please check for an updated version of Sunshine.</string>
+    <string name="empty_forecast_list_server_unknown">No weather information available. Try again in sometime.</string>
+    <string name="empty_forecast_list_unknown_location">The location you entered is invalid, please re-enter a valid location.</string>
+
+    <!-- Strings used when displaying the state of the Location in settings -->
+    <string name="pref_location_error_description">Invalid Location (<xliff:g id="location_setting">%1$s</xliff:g>)"</string>
+    <string name="pref_location_unknown_description">Validating Location... (<xliff:g id="location_setting">%1$s</xliff:g>)"</string>
+    <string name="weather_alert">Weather Alert!</string>
+    <string name="gcm_weather_alert">Extreme weather conditions in your area.</string>
+    <string name="detail_icon_transition_name" translatable="false">TN_detail_icon</string>
+    <string name="forecast_icon">forecast_icon</string>
+    <string name="choose_current_location_description">Choose your preferred location</string>
+    <string name="pref_location_latitude" translatable = "false">loc-latitude</string>
+    <string name="pref_location_longitude" translatable = "false">loc-longitude</string>
+    <string name="title_widget_today">Today\'s Weather</string>
+    <string name="muzei_description">Muzei</string>
 
 </resources>

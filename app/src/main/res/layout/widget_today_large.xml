@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="@dimen/widget_margin">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/widget"
+        android:padding="8dp"
+        android:orientation="horizontal"
+        android:background="@color/color_primary">
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_vertical">
+        <ImageView
+            android:id="@+id/widget_icon"
+            android:layout_width="@dimen/minResizeWidth"
+            android:layout_height="wrap_content"
+            tools:src="@drawable/art_clear"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:id="@+id/widget_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Clear"
+            android:layout_gravity="center_vertical"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/color_primary_light"
+            android:paddingLeft="16dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:layout_gravity="center_vertical|right">
+
+
+            <TextView
+                android:id="@+id/widget_high_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="76"
+                android:layout_marginBottom="4dp"
+                android:gravity="end|right"
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:textColor="@color/color_primary_light"
+                />
+
+
+            <TextView
+                android:id="@+id/widget_low_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="23"
+                android:gravity="end|right"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/color_primary_light"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

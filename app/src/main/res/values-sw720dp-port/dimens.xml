@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="list_item_extra_padding">80dp</dimen>
+    <dimen name="forecast_temprature_space">@dimen/abc_list_item_padding_horizontal_material</dimen>
+    <dimen name="detail_view_padding_vertical">@dimen/abc_list_item_padding_horizontal_material</dimen>
+</resources>

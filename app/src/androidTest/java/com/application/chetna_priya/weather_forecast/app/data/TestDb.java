@@ -47,7 +47,7 @@ public class TestDb extends AndroidTestCase
         tableNameHashSet.add(WeatherContract.WeatherEntry.TABLE_NAME);
 
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
-        SQLiteDatabase db = new WeatherDbHelper(
+        SQLiteDatabase db = WeatherDbHelper.getInstance(
                 this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
@@ -104,7 +104,7 @@ public class TestDb extends AndroidTestCase
 
     public void testLocationTable() {
         // First step: Get reference to writable database
-        WeatherDbHelper helper = new WeatherDbHelper(mContext);
+        WeatherDbHelper helper = WeatherDbHelper.getInstance(mContext);
         SQLiteDatabase database = helper.getWritableDatabase();
         long rowId = insertLocation();
         assertTrue(rowId != -1);
@@ -136,7 +136,7 @@ public class TestDb extends AndroidTestCase
         // First insert the location, and then use the locationRowId to insert
         // the weather. Make sure to cover as many failure cases as you can.
 
-        WeatherDbHelper helper = new WeatherDbHelper(mContext);
+        WeatherDbHelper helper = WeatherDbHelper.getInstance(mContext);
         SQLiteDatabase database = helper.getWritableDatabase();
         long rowId = insertLocation();
         assertTrue(rowId!= -1);
@@ -174,7 +174,7 @@ public class TestDb extends AndroidTestCase
         testWeatherTable and testLocationTable.
      */
     public long insertLocation() {
-        WeatherDbHelper helper = new WeatherDbHelper(mContext);
+        WeatherDbHelper helper = WeatherDbHelper.getInstance(mContext);
         SQLiteDatabase database = helper.getWritableDatabase();
         // Create ContentValues of what you want to insert
         // (you can use the createNorthPoleLocationValues if you wish)

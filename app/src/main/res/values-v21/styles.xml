@@ -5,12 +5,27 @@
         <item name="android:colorPrimary">@color/sunshine_blue</item>
         <item name="android:colorPrimaryDark">@color/sunshine_dark_blue</item>
     </style>-->
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/sunshine_blue</item>
-        <item name="colorPrimaryDark">@color/sunshine_dark_blue</item>
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="toolbarStyle">@style/toolbar</item>
+    </style>
+    <style name="ForecastTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Sunshine.NoTitle</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+    </style>
+    <style name="toolbar" parent="android:Widget.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
+    </style>
+    <style name="SettingsTheme" parent="AppTheme"/>
+    <style name="DetailTheme" parent="AppTheme">
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowEnterTransition">@transition/detail_transition_port_enter</item>
     </style>
 
-
-    <style name="SettingsTheme" parent="AppTheme"/>
 
 </resources>

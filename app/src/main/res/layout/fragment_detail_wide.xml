@@ -1,114 +1,113 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="@dimen/today_weather_padding">
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/today_weather_padding">
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+
+            <include layout="@layout/detail_today_grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="0dp"
+                android:background="@android:color/transparent"/>
+
+        </FrameLayout>
+
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/layout_additional_pane"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:columnCount="2"
+            android:background="@color/detail_accent_pane_background"
+            android:paddingEnd="@dimen/abc_list_item_padding_horizontal_material"
+            android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+            >
+
+            <android.support.v7.widget.Space
+                app:layout_columnSpan="2"
+                app:layout_rowWeight="1" />
 
             <TextView
-                android:id="@+id/tv_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Today\nJune 24"/>
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_weight="1"
+                android:fontFamily="sans-serif"
                 android:gravity="center_vertical"
-                android:paddingLeft="@dimen/today_weather_padding">
-
-                <TextView
-                    android:id="@+id/tv_max_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="21"/>
-
-                <TextView
-                    android:id="@+id/tv_min_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/weather_text_padding"
-                    android:text="8"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <ImageView
-                    android:id="@+id/img_weather_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:id="@+id/tv_weather_desc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Clear"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/today_weather_padding">
+                android:text="@string/humidity"
+                android:textColor="@color/detail_accent_label"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
+                android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+                android:paddingBottom="@dimen/abc_list_item_padding_horizontal_material"
+                />
 
             <TextView
                 android:id="@+id/tv_humidity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/humidity"/>
-
+                android:fontFamily="sans-serif"
+                android:gravity="center_vertical"
+                tools:text="38%"
+                android:textColor="@android:color/white"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                />
 
             <TextView
-                android:id="@+id/tv_wind"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/wind"
-                android:paddingTop="@dimen/weather_text_padding"/>
+                android:fontFamily="sans-serif"
+                android:gravity="center_vertical"
+                android:text="@string/pressure"
+                android:textColor="@color/detail_accent_label"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:paddingTop="@dimen/detail_view_extra_padding"
+                android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
+                android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+                android:paddingBottom="@dimen/abc_list_item_padding_horizontal_material"
+                />
 
 
             <TextView
                 android:id="@+id/tv_pressure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/pressure"
-                android:paddingTop="@dimen/weather_text_padding"/>
+                android:fontFamily="sans-serif"
+                android:gravity="center_vertical"
+                tools:text="995 hPa"
+                android:textColor="@android:color/white"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                />
 
+            <TextView
+                android:fontFamily="sans-serif"
+                android:gravity="center_vertical"
+                android:text="@string/wind"
+                android:textColor="@color/detail_accent_label"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:paddingTop="@dimen/detail_view_extra_padding"
+                android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
+                android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+                />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/tv_wind"
+                android:fontFamily="sans-serif"
+                android:gravity="center_vertical"
+                tools:text="4km/h NW"
+                android:textColor="@android:color/white"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                />
 
+            <android.support.v7.widget.Space
+                app:layout_columnSpan="2"
+                app:layout_rowWeight="1" />
 
+        </android.support.v7.widget.GridLayout>
     </LinearLayout>
-
-
-</ScrollView>
-
+</FrameLayout>

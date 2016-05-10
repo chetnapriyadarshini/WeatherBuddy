@@ -6,4 +6,32 @@
     <dimen name="weather_text_padding">4dp</dimen>
     <dimen name="date_and_icon_padding">5dp</dimen>
     <dimen name="today_weather_padding">16dp</dimen>
+    <dimen name="additonal_pane_horizontal_padding">48dp</dimen>
+    <dimen name="notification_large_icon_default">48dp</dimen>
+    <!-- Icon Sizes -->
+    <dimen name="today_icon">96dp</dimen>
+    <dimen name="forecast_detail_horizontal_padding">32dp</dimen>
+    <dimen name="listPreferredItemHeight">48dp</dimen>
+    <dimen name="appbar_elevation">4dp</dimen>
+    <dimen name="today_icon_size">40dp</dimen>
+
+    <dimen name="list_icon">40dp</dimen>
+
+    <!-- Extra Padding -->
+    <dimen name="detail_view_extra_padding">@dimen/abc_list_item_padding_horizontal_material</dimen>
+    <dimen name="details_app_bar_overlap">24dp</dimen>
+    <dimen name="forecast_temprature_space">0dp</dimen>
+    <dimen name="list_item_extra_padding">0dp</dimen>
+
+    <dimen name="detail_card_elevation">6dp</dimen>
+    <dimen name="landscape_forecast_view_width">360dp</dimen>
+    <dimen name="widget_today_default_height">40dp</dimen>
+    <dimen name="widget_today_default_width">110dp</dimen>
+    <dimen name="widget_today_large_width">220dp</dimen>
+    <dimen name="widget_margin">8dp</dimen>
+    <dimen name="widget_element_padding">10dp</dimen>
+    <dimen name="minResizeHeight">40dp</dimen>
+    <dimen name="minResizeWidth">40dp</dimen>
+    <dimen name="small_widget_layout">110dp</dimen>
+    <dimen name="default_widget_layout">220dp</dimen>
 </resources>

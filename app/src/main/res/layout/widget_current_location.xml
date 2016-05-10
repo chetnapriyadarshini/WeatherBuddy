@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="48dp"
+    android:id="@+id/location_picker">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_gps_fixed_black"
+        android:contentDescription="@string/choose_current_location_description"
+        android:layout_gravity="end|center_vertical"
+        android:tint="@color/material_deep_teal_500"/>
+
+</FrameLayout>

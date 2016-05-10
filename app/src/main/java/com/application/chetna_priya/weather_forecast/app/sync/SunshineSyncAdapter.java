@@ -14,10 +14,13 @@ import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.format.Time;
@@ -28,6 +31,8 @@ import com.application.chetna_priya.weather_forecast.app.MainActivity;
 import com.application.chetna_priya.weather_forecast.app.R;
 import com.application.chetna_priya.weather_forecast.app.Utility;
 import com.application.chetna_priya.weather_forecast.app.data.WeatherContract;
+import com.application.chetna_priya.weather_forecast.app.muzei.WeatherMuzeiArtSource;
+import com.bumptech.glide.Glide;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,10 +42,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
@@ -64,9 +72,30 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
+    public static final String ACTION_DATA_UPDATED = "com.application.chetna_priya.weather_forecast.app.ACTION_DATA_UPDATED";
+
+    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,
+            LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_LOCATION_INVALID})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface LocationStatus{}
+
+
+    public static final int LOCATION_STATUS_OK = 0;
+    public static final int LOCATION_STATUS_SERVER_DOWN = 1;
+    public static final int LOCATION_STATUS_SERVER_INVALID = 2;
+    public static final int LOCATION_STATUS_UNKNOWN = 3;
+    public static final int LOCATION_STATUS_LOCATION_INVALID = 4;
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+    }
+
+    public void setLocationStatus(@LocationStatus int locationStatus)
+    {
+        Context context = getContext();
+        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefs.putInt(context.getResources().getString(R.string.pref_location_status_key), locationStatus);
+        prefs.commit();
     }
 
     @Override
@@ -93,7 +122,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
         String format = "json";
         String units = "metric";
-        int numDays = 7;
+        int numDays = 14;
 
         try {
             // Construct the URL for the OpenWeatherMap query
@@ -106,17 +135,30 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             final String UNITS_PARAM = "units";
             final String DAYS_PARAM = "cnt";
             final String APPID_PARAM = "APPID";
+            final String LAT_PARAM = "lat";
+            final String LONG_PARAM = "lon";
 
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, loc)
-                    .appendQueryParameter(FORMAT_PARAM, format)
+
+            Uri.Builder builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon();
+            if(Utility.isLocationLatLongAvailable(getContext()))
+            {
+                float locLatitude =  Utility.getLocationLatitude(getContext());
+                float locLongitude = Utility.getLocationLongitude(getContext());
+
+                builtUri.appendQueryParameter(LAT_PARAM, String.valueOf(locLatitude))
+                        .appendQueryParameter(LONG_PARAM, String.valueOf(locLongitude));
+            }else {
+                builtUri.appendQueryParameter(QUERY_PARAM, loc);
+            }
+
+            builtUri.appendQueryParameter(FORMAT_PARAM, format)
                     .appendQueryParameter(UNITS_PARAM, units)
                     .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                     .appendQueryParameter(APPID_PARAM, Constant.WEATHER_API_KEY)
                     .build();
 
             URL url = new URL(builtUri.toString());
-
+            Log.d(LOG_TAG, String.valueOf(builtUri));
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
@@ -141,11 +183,15 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
+                Log.d(LOG_TAG, "11111 ");
+                setLocationStatus(LOCATION_STATUS_SERVER_DOWN);
                 return;
             }
             forecastJsonStr = buffer.toString();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
+            Log.d(LOG_TAG, "2222 " );
+            setLocationStatus(LOCATION_STATUS_SERVER_DOWN);
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
             return;
@@ -158,6 +204,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     reader.close();
                 } catch (final IOException e) {
                     Log.e(LOG_TAG, "Error closing stream", e);
+                    Log.d(LOG_TAG, "3333 " );
+                    setLocationStatus(LOCATION_STATUS_UNKNOWN);
                 }
             }
         }
@@ -166,6 +214,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             getWeatherDataFromJson(forecastJsonStr, loc);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
+            Log.d(LOG_TAG, "44444 " );
+            setLocationStatus(LOCATION_STATUS_SERVER_INVALID);
             e.printStackTrace();
         }
     }
@@ -194,6 +244,30 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 int iconId = Utility.getIconResourceForWeatherCondition(weatherId);
                 String title = context.getString(R.string.app_name);
+                int largeIconWidth = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
+                        ? context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width)
+                        : context.getResources().getDimensionPixelSize(R.dimen.notification_large_icon_default);
+
+                int largeIconHeight = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
+                        ? context.getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height)
+                        : context.getResources().getDimensionPixelSize(R.dimen.notification_large_icon_default);
+
+                Bitmap largeIcon;
+
+                try {
+                    largeIcon = Glide.with(context).
+                            load(Utility.getArtUrlForWeatherCondition(context,weatherId))
+                            .asBitmap()
+                            .error(iconId)
+                            .into(largeIconWidth, largeIconHeight)
+                            .get();
+                } catch (InterruptedException e) {
+                    largeIcon = BitmapFactory.decodeResource(context.getResources(),iconId);
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    largeIcon = BitmapFactory.decodeResource(context.getResources(),iconId);
+                    e.printStackTrace();
+                }
 
                 // Define the text of the forecast.
                 String contentText = String.format(context.getString(R.string.format_notification),
@@ -205,6 +279,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 NotificationCompat.Builder notificationBuilder =
                         new NotificationCompat.Builder(context)
                         .setSmallIcon(iconId)
+                        .setLargeIcon(largeIcon)
                         .setContentTitle(title)
                         .setContentText(contentText)
                         .setAutoCancel(true);
@@ -265,9 +340,27 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         final String OWM_WEATHER = "weather";
         final String OWM_DESCRIPTION = "main";
         final String OWM_WEATHER_ID = "id";
+        final String OWM_RESPONSE_CODE = "cod";
 
         try {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            if(forecastJson.has(OWM_RESPONSE_CODE))
+            {
+                int error_code = forecastJson.getInt(OWM_RESPONSE_CODE);
+                switch (error_code) {
+                    case HttpURLConnection.HTTP_OK:
+                        break;
+
+                    case HttpURLConnection.HTTP_NOT_FOUND:
+                        Log.d(LOG_TAG, "Setting location unknownnnnnnnnnnnn");
+                        setLocationStatus(LOCATION_STATUS_LOCATION_INVALID);
+                        return;
+
+                    default:
+                        setLocationStatus(LOCATION_STATUS_SERVER_DOWN);
+                        return;
+                }
+            }
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
             JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
@@ -330,7 +423,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                         dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
                 description = weatherObject.getString(OWM_DESCRIPTION);
                 weatherId = weatherObject.getInt(OWM_WEATHER_ID);
-
                 // Temperatures are in a child object called "temp".  Try not to name variables
                 // "temp" when working with temperature.  It confuses everybody.
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
@@ -370,11 +462,15 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                         condition, new String[]{Long.toString(dayTime.setJulianDay(julianStartDay-1))});
                 Log.d(LOG_TAG, "OLD ROWS DELETED: "+rowsDeleted);
             }
+            setLocationStatus(LOCATION_STATUS_OK);
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
+        Intent updatedWidgetIntent = new Intent(ACTION_DATA_UPDATED);
+        getContext().sendBroadcast(updatedWidgetIntent);
+        getContext().startService(updatedWidgetIntent.setClass(getContext(), WeatherMuzeiArtSource.class));
     }
 
     public long addLocation(String locationSetting, String cityName, double lat, double lon) {
@@ -401,6 +497,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             }
             else{
 
+                Log.d(LOG_TAG,"Inserted city "+cityName+" lat is "+lat+" lon is "+lon);
                 ContentValues values = new ContentValues();
                 values.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING,locationSetting);
                 values.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME,cityName);
@@ -458,7 +555,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // Create the account type and default account
         Account newAccount = new Account(
-                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+                context.getString(R.string.app_name), "sunshine.example.com");
 
         // If the password doesn't exist, the account doesn't exist
         if ( null == accountManager.getPassword(newAccount) ) {

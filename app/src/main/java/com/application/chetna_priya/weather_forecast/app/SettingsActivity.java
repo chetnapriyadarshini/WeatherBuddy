@@ -5,22 +5,33 @@ import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+
 public class SettingsActivity extends AppCompatActivity{
+
+
+    public static final int PLACE_PICKER_REQUEST = 1;
+    private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
+    private SettingsActivityFragment settingsActivityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         FragmentManager fragmentManager = getFragmentManager();
-        SettingsActivityFragment settingsActivityFragment = (SettingsActivityFragment) getFragmentManager()
+        settingsActivityFragment = (SettingsActivityFragment) getFragmentManager()
                 .findFragmentById(R.id.fragment_settings);
         if(settingsActivityFragment == null)
         {
@@ -36,6 +47,21 @@ public class SettingsActivity extends AppCompatActivity{
     public Intent getParentActivityIntent() {
         return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == PLACE_PICKER_REQUEST)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                settingsActivityFragment.onActivityResult(requestCode, resultCode, data);
+
+            }else
+                super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
 
   /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {

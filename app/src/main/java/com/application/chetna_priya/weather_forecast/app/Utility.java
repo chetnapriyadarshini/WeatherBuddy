@@ -1,9 +1,16 @@
 package com.application.chetna_priya.weather_forecast.app;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
+import android.util.Log;
 
+import com.application.chetna_priya.weather_forecast.app.sync.SunshineSyncAdapter;
+
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,13 +19,17 @@ import java.util.Date;
  */
 public class Utility
 {
+    private static final String LOG_TAG = Utility.class.getSimpleName();
+    private static final float DEFAULT_LATLONG = 0f;
+
     public static boolean isNotificationsOn(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(context.getString(R.string.pref_notification_key),true);
+        return prefs.getBoolean(context.getString(R.string.pref_notification_key), true);
     }
 
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Log.d(LOG_TAG, "Returning PREFEREDDDD Locationnnnnnn");
         return prefs.getString(context.getString(R.string.pref_location_key),
                 context.getString(R.string.pref_default_location));
     }
@@ -28,6 +39,22 @@ public class Utility
         return prefs.getString(context.getString(R.string.pref_unit_key),
                 context.getString(R.string.pref_unit_metric))
                 .equals(context.getString(R.string.pref_unit_metric));
+    }
+
+    public static boolean isLocationLatLongAvailable(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return  preferences.contains(context.getString(R.string.pref_location_latitude))
+                && preferences.contains(context.getString(R.string.pref_location_longitude));
+    }
+
+    public static float getLocationLatitude(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getFloat(context.getString(R.string.pref_location_latitude), DEFAULT_LATLONG);
+    }
+
+    public static float getLocationLongitude(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getFloat(context.getString(R.string.pref_location_longitude), DEFAULT_LATLONG);
     }
 
     public static String getFormattedWind(Context context, float windSpeed, float degrees) {
@@ -63,15 +90,52 @@ public class Utility
         return String.format(context.getString(windFormat), windSpeed, direction);
     }
 
+
+    /*
+    * Helper method to provide the correct image according to the weather condition id returned
+    * by the OpenWeatherMap call.
+    *
+    * @param weatherId from OpenWeatherMap API response
+    * @return A string URL to an appropriate image or null if no mapping is found
+    */
+    public static String getImageUrlForWeatherCondition(int weatherId) {
+        // Based on weather code data found at:
+        // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
+        if (weatherId >= 200 && weatherId <= 232) {
+            return "http://upload.wikimedia.org/wikipedia/commons/2/28/Thunderstorm_in_Annemasse,_France.jpg";
+        } else if (weatherId >= 300 && weatherId <= 321) {
+            return "http://upload.wikimedia.org/wikipedia/commons/a/a0/Rain_on_leaf_504605006.jpg";
+        } else if (weatherId >= 500 && weatherId <= 504) {
+            return "http://upload.wikimedia.org/wikipedia/commons/6/6c/Rain-on-Thassos.jpg";
+        } else if (weatherId == 511) {
+            return "http://upload.wikimedia.org/wikipedia/commons/b/b8/Fresh_snow.JPG";
+        } else if (weatherId >= 520 && weatherId <= 531) {
+            return "http://upload.wikimedia.org/wikipedia/commons/6/6c/Rain-on-Thassos.jpg";
+        } else if (weatherId >= 600 && weatherId <= 622) {
+            return "http://upload.wikimedia.org/wikipedia/commons/b/b8/Fresh_snow.JPG";
+        } else if (weatherId >= 701 && weatherId <= 761) {
+            return "http://upload.wikimedia.org/wikipedia/commons/e/e6/Westminster_fog_-_London_-_UK.jpg";
+        } else if (weatherId == 761 || weatherId == 781) {
+            return "http://upload.wikimedia.org/wikipedia/commons/d/dc/Raised_dust_ahead_of_a_severe_thunderstorm_1.jpg";
+        } else if (weatherId == 800) {
+            return "http://upload.wikimedia.org/wikipedia/commons/7/7e/A_few_trees_and_the_sun_(6009964513).jpg";
+        } else if (weatherId == 801) {
+            return "http://upload.wikimedia.org/wikipedia/commons/e/e7/Cloudy_Blue_Sky_(5031259890).jpg";
+        } else if (weatherId >= 802 && weatherId <= 804) {
+            return "http://upload.wikimedia.org/wikipedia/commons/5/54/Cloudy_hills_in_Elis,_Greece_2.jpg";
+        }
+        return null;
+    }
+
     public static String formatTemperature(Context context, double temperature) {
         boolean isMetric = isMetric(context);
         double temp;
         if ( !isMetric ) {
-            temp = 9*temperature/5+32;
+            temp = (9*temperature/5)+32;
         } else {
             temp = temperature;
         }
-        return context.getString(R.string.format_temprature,temp);
+        return context.getString(R.string.format_temprature, temp);
     }
 
     public static String formatDate(long dateInMillis) {
@@ -122,6 +186,30 @@ public class Utility
             return shortenedDateFormat.format(dateInMillis);
         }
     }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    @SuppressWarnings("ResourceType")
+    static public @SunshineSyncAdapter.LocationStatus
+    int getLocationStatus(Context context)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(context.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
+    }
+
+    public static void resetLocationStatus(Context context)
+    {
+        SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefs.putInt(context.getResources().getString(R.string.pref_location_status_key),
+                SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
+        prefs.commit();
+    }
+
 
     /**
      * Given a day, returns just the name to use for that day.
@@ -202,6 +290,69 @@ public class Utility
         }
         return -1;
     }
+
+    /**
+     * Helper method to provide the art urls according to the weather condition id returned
+     * by the OpenWeatherMap call.
+     *
+     * @param context Context to use for retrieving the URL format
+     * @param weatherId from OpenWeatherMap API response
+     * @return url for the corresponding weather artwork. null if no relation is found.
+     */
+    public static String getArtUrlForWeatherCondition(Context context, int weatherId) {
+        // Based on weather code data found at:
+        // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String path =  prefs.getString(context.getString(R.string.pref_icon_key),
+                context.getString(R.string.pref_defualt_icon_type));
+        String art_path = "art_";
+
+
+        if (weatherId >= 200 && weatherId <= 232) {
+            /*return context.getString(R.string.format_art_url,path+"storm");*/
+            art_path = art_path.concat("storm");
+        }
+        else if (weatherId >= 300 && weatherId <= 321) {
+            /*return context.getString(R.string.format_art_url,path+"light_rain");*/
+            art_path = art_path.concat("light_rain");
+        } else if (weatherId >= 500 && weatherId <= 504) {
+            /*return context.getString(R.string.format_art_url,path+"rain");*/
+            art_path = art_path.concat("rain");
+        } else if (weatherId == 511) {
+            /*return context.getString(R.string.format_art_url,path+"snow");*/
+            art_path = art_path.concat("snow");
+        } else if (weatherId >= 520 && weatherId <= 531) {
+            /*return context.getString(R.string.format_art_url,path+"rain");*/
+            art_path = art_path.concat("rain");
+        } else if (weatherId >= 600 && weatherId <= 622) {
+            /*return context.getString(R.string.format_art_url,path+"snow");*/
+            art_path = art_path.concat("snow");
+        } else if (weatherId >= 701 && weatherId <= 761) {
+            /*return context.getString(R.string.format_art_url,path+"fog");*/
+            art_path = art_path.concat("fog");
+        } else if (weatherId == 761 || weatherId == 781) {
+            /*return context.getString(R.string.format_art_url,path+"storm");*/
+            art_path = art_path.concat("storm");
+        } else if (weatherId == 800) {
+            /*return context.getString(R.string.format_art_url,path+"clear");*/
+            art_path = art_path.concat("clear");
+        } else if (weatherId == 801) {
+            /*return context.getString(R.string.format_art_url,path+"light_clouds");*/
+            art_path = art_path.concat("light_clouds");
+        } else if (weatherId >= 802 && weatherId <= 804) {
+            /*return context.getString(R.string.format_art_url,path+"clouds");*/
+            art_path = art_path.concat("clouds");
+        }
+        art_path = art_path.concat(".png");
+
+        Uri buildUri = Uri.parse(context.getString(R.string.format_art_url)).buildUpon()
+                .appendPath(path)
+                .appendPath(art_path).build();
+        Log.d(LOG_TAG, "URL: "+buildUri);
+        return String.valueOf(buildUri);
+    }
+
 
     /**
      * Helper method to provide the art resource id according to the weather condition id returned
