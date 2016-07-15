@@ -1,6 +1,6 @@
 # WeatherBuddy
 
-A weather app optimized for all screen sizes following Material Design guidelines providing information on weather for the next 14 days based on his location or preferred location. It has integrated google maps, uses OpenWeatherApi as its data source. It also comes with a widget and wallpaper.
+A weather app optimized for all screen sizes following Material Design guidelines providing information on weather for the next 14 days based on his location or preferred location. It has integrated google maps, uses OpenWeatherApi as its data source. It also comes with two widgets - one displaying current day temp and forecast and other the forecast of whole week and wallpaper. Clicking on the widget takes user to a detailed view of the weather conditions of a particular day.
 
 ##Usage
 `git clone https://github.com/chetnapriyadarshini/WeatherBuddy`
