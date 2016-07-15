@@ -5,5 +5,5 @@ A weather app optimized for all screen sizes following Material Design guideline
 ##Usage
 `git clone https://github.com/chetnapriyadarshini/WeatherBuddy`
 
-- You will need to create an account in OpenWeatherMap to obtain the Api key needed to fetch weather data. Place this in gradle.properties to get the app working.
+- You will need to create an account in OpenWeatherMap to obtain the Api key needed to fetch weather data. Place this in Constant.java file as value of the field "WEATHER_API_KEY  to get the app working.
 - If you need to use the wallpaper working you need to install the Muzei app from play store.
